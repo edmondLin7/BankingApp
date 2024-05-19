@@ -2,29 +2,31 @@ package bankingapp.employee;
 
 import bankingapp.ConnectionFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class EmployeeDaoImpl implements EmployeeDao{
     Connection connection = ConnectionFactory.getConnection();
 
     @Override
-    public void addEmployee(Employee employee) throws SQLException {
+    public int addEmployee(Employee employee) {
         try {
             String sql = "insert into employee (name, position, email) values (?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, employee.getName());
             preparedStatement.setString(2, employee.getPosition());
             preparedStatement.setString(3, employee.getEmail());
-            int count = preparedStatement.executeUpdate();
-            if (count > 0) {
-                System.out.println("employee saved");
-            } else {
-                System.out.println("Opps! something went wrong, please try again");
+            int rowsInserted = preparedStatement.executeUpdate();
+            if (rowsInserted > 0) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        System.out.println("Your accountID is " +  generatedKeys.getInt(1));
+                        return generatedKeys.getInt(1);
+                    }
+                }
             }
         } catch (SQLException e) {
-            System.out.println("Account is already made with email");
+            e.printStackTrace();
         }
+        return -1; // return -1 if the insertion fails
     }
 }

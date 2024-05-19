@@ -2,28 +2,31 @@ package bankingapp.customer;
 
 import bankingapp.ConnectionFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class CustomerDaoImpl implements CustomerDao {
     Connection connection = ConnectionFactory.getConnection();
 
 
-    public void addCustomer(Customer customer)  {
+    public int addCustomer(Customer customer)  {
         try {
-            String sql = "insert into customer (name, email) values (?, ?)";
-            PreparedStatement preparedStatement = this.connection.prepareStatement(sql);
+            String sql = "insert into customer (name, email, pin) values (?, ?, ?)";
+            PreparedStatement preparedStatement = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, customer.getName());
             preparedStatement.setString(2, customer.getEmail());
-            int count = preparedStatement.executeUpdate();
-            if (count > 0) {
-                System.out.println("customer saved");
-            } else {
-                System.out.println("Opps! something went wrong, please try again");
+            preparedStatement.setString(3, customer.getPin());
+            int rowsInserted = preparedStatement.executeUpdate();
+            if (rowsInserted > 0) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        System.out.println("Your customer Id is : " + generatedKeys.getInt(1));
+                        return generatedKeys.getInt(1);
+                    }
+                }
             }
         } catch (SQLException e) {
-            System.out.println("Account is already made with email");
+            e.printStackTrace();
         }
+        return -1; // return -1 if the insertion fails
     }
 }
