@@ -37,7 +37,7 @@ public class AccountReqServiceImpl {
         accountRequestDao.updateAccountRequestStatus(rejectRequestId, "R");
     }
 
-    public void getAllCustIdAccountRequests(int CustId) {
+    public List<AccountRequest> getAllCustIdAccountRequests(int CustId) {
 
         List<AccountRequest> accounts = accountRequestDao.getAccountRequestsByCustomerId(CustId);
         for (AccountRequest acc: accounts) {
@@ -46,5 +46,10 @@ public class AccountReqServiceImpl {
                     " | Status: " + acc.getStatus()
             );
         }
+        return accounts;
+    }
+
+    public void deleteAccountRequest(int requestId) {
+        accountRequestDao.deleteAccountRequest(requestId);
     }
 }

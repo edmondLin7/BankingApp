@@ -8,5 +8,5 @@ public interface AccountRequestDao {
     List<AccountRequest> getAllAccountRequests();
     void updateAccountRequestStatus(int requestId, String newStatus);
     List<AccountRequest> getAccountRequestsByCustomerId(int customerId);
-
+    void deleteAccountRequest(int requestId);
 }

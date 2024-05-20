@@ -1,7 +1,9 @@
 package bankingapp;
 
+import bankingapp.account.Account;
 import bankingapp.account.AccountServiceImpl;
 import bankingapp.accountrequest.AccountReqServiceImpl;
+import bankingapp.accountrequest.AccountRequest;
 import bankingapp.customer.Customer;
 import bankingapp.customer.CustomerDao;
 import bankingapp.customer.CustomerDaoFactory;
@@ -12,6 +14,7 @@ import bankingapp.employee.EmployeeDaoFactory;
 import bankingapp.employee.EmployeeServiceImpl;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -50,6 +53,7 @@ public class Main {
         System.out.println("3. Employee Login");
         System.out.println("4. Request to create an banking account");
         System.out.println("5. Create Account If Approved");
+        System.out.println("6. Customer Deposit money");
 
 
         while (true) {
@@ -100,10 +104,26 @@ public class Main {
                 case 5:
                     System.out.print("Enter custID to see your pending account requests ");
                     int custID = scanner.nextInt();
-                    accountReqService.getAllCustIdAccountRequests(custID);
-                    //System.out.print("Enter request ID to create account: ");
-                    //int createRequestId = scanner.nextInt();
-                   // int accountId = accountService.createAccountIfApproved(createRequestId);
+                    List<AccountRequest> accountRequestList = accountReqService.getAllCustIdAccountRequests(custID);
+                    System.out.print("Enter request ID to create account: ");
+                    int requestId = scanner.nextInt();
+                    AccountRequest accRequest = new AccountRequest(-1, -1, "N");
+                    for (AccountRequest acc : accountRequestList) {
+                        if (acc.getRequestId() == requestId) {
+                            accRequest = acc;
+                        }
+                    }
+                    if (accRequest.getStatus().equals("A")) {
+                        accountService.createAccount();
+                        accountReqService.deleteAccountRequest(accRequest.getRequestId());
+                    } else {
+                        System.out.println("Account not approved");
+                    }
+                break;
+                    // int accountId = accountService.createAccountIfApproved(createRequestId);
+                case 6:
+                    accountService.findAccountsByCustomerId();
+                    accountService.deposit();
             }
         }
     }

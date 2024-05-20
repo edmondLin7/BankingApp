@@ -90,5 +90,17 @@ public class AccountReqDaoImpl implements AccountRequestDao{
         return accountRequests;
     }
 
+    @Override
+    public void deleteAccountRequest(int requestId) {
+        try {
+            String sql = "DELETE FROM AccountRequest WHERE request_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, requestId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Failed to delete");
+        }
+    }
+
 
 }
