@@ -1,5 +1,7 @@
 package bankingapp;
 
+import bankingapp.account.AccountServiceImpl;
+import bankingapp.accountrequest.AccountReqServiceImpl;
 import bankingapp.customer.Customer;
 import bankingapp.customer.CustomerDao;
 import bankingapp.customer.CustomerDaoFactory;
@@ -15,6 +17,10 @@ import java.util.Scanner;
 public class Main {
     private static CustomerServiceImpl customerService = new CustomerServiceImpl();
     private static EmployeeServiceImpl employeeService = new EmployeeServiceImpl();
+
+    private static AccountReqServiceImpl accountReqService = new AccountReqServiceImpl();
+
+    private static AccountServiceImpl accountService = new AccountServiceImpl();
 
     public static void addEmployee() throws SQLException {
         /*
@@ -40,9 +46,11 @@ public class Main {
 
         System.out.println("Welcome to the Bank App");
         System.out.println("1. Register Customer");
-        System.out.println("2. Apply for Account");
-        System.out.println("3. View Account Balance");
-        System.out.println("4. Exit");
+        System.out.println("2. Register Account");
+        System.out.println("3. Employee Login");
+        System.out.println("4. Request to create an banking account");
+        System.out.println("5. Create Account If Approved");
+
 
         while (true) {
             System.out.print("Choose an option: ");
@@ -64,6 +72,38 @@ public class Main {
                     System.out.print("Enter employee email: ");
                     String employeeEmail = scanner.nextLine();
                     int employeeId = employeeService.registerEmployee(employeeName, position, employeeEmail);
+                    break;
+                case 3:
+                    if(employeeService.loginEmployee()) { // if employee login successful
+                        System.out.println("1. Show all account request: ");
+                        System.out.println("2. Accept or Deny account request creation: ");
+                        int selection = scanner.nextInt();
+                        if (selection == 1) {
+                            accountReqService.getAllAccountRequests();
+                        } else if (selection == 2) {
+                            System.out.println("All Account Requests");
+                            accountReqService.getAllAccountRequests();
+                            System.out.println("1. Accept an account");
+                            System.out.println("2. Deny an account");
+                            int selection2 = scanner.nextInt();
+                            if (selection2 == 1) {
+                                accountReqService.approveAccountRequest();
+                            } else if (selection2 == 2) {
+                                accountReqService.rejectAccountRequest();
+                            }
+                        }
+                    }
+                    break;
+                case 4:
+                    accountReqService.createAccountRequest();
+                    break;
+                case 5:
+                    System.out.print("Enter custID to see your pending account requests ");
+                    int custID = scanner.nextInt();
+                    accountReqService.getAllCustIdAccountRequests(custID);
+                    //System.out.print("Enter request ID to create account: ");
+                    //int createRequestId = scanner.nextInt();
+                   // int accountId = accountService.createAccountIfApproved(createRequestId);
             }
         }
     }

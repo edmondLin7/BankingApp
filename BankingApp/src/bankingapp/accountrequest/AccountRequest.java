@@ -1,14 +1,24 @@
 package bankingapp.accountrequest;
 
 public class AccountRequest {
+
+    private int requestId;
     private int customerId;
     private String status;
 
     // Parameterized constructor
     public AccountRequest(int requestId, int customerId, String status) {
+        this.requestId = requestId;
         this.customerId = customerId;
         this.status = status;
     }
+
+    public AccountRequest(int customerId, String status) {
+        this.customerId = customerId;
+        this.status = status;
+    }
+
+    public int getRequestId() { return requestId; }
     public int getCustomerId() {
         return customerId;
     }

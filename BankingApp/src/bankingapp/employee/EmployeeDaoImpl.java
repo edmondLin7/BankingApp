@@ -29,4 +29,23 @@ public class EmployeeDaoImpl implements EmployeeDao{
         }
         return -1; // return -1 if the insertion fails
     }
+
+    @Override
+    public boolean loginEmployee(int employeeID) {
+        try {
+            String sql = "SELECT 1 FROM Employee WHERE employee_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, employeeID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                System.out.println("Login successful");
+                return true;
+            } else {
+                System.out.println("Login unsuccessful");
+            }
+        } catch (SQLException e) {
+            System.out.println("Unable to find user");
+        }
+        return false;
+    }
 }

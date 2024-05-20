@@ -21,40 +21,74 @@ public class AccountReqDaoImpl implements AccountRequestDao{
             preparedStatement.setString(2, accountRequest.getStatus());
             int count = preparedStatement.executeUpdate();
             if (count > 0) {
-                System.out.println("customer saved");
+                System.out.println("request created saved");
             } else {
                 System.out.println("Opps! something went wrong, please try again");
             }
         } catch (SQLException e) {
-            System.out.println("Account is already made with email");
+            System.out.println("Error has occurred, try using a valid customerID");
         }
     }
 
     @Override
-    public List<AccountRequest> getAllAccountRequests() throws SQLException {
+    public List<AccountRequest> getAllAccountRequests() {
+        List<AccountRequest> accountRequests = new ArrayList<>();
+        try {
+            String sql = "select * from accountrequest";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int requestId = resultSet.getInt("request_id");
+                int customerId = resultSet.getInt("customer_id");
+                String status = resultSet.getString("status");
+                accountRequests.add(new AccountRequest(requestId, customerId, status));
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to get all accounts");
+        }
+        return accountRequests;
+    }
+
+    @Override
+    public void updateAccountRequestStatus(int requestId, String newStatus)  {
+        try {
+            String sql = "UPDATE AccountRequest SET status = ? WHERE request_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, newStatus);
+            preparedStatement.setInt(2, requestId);
+            preparedStatement.executeUpdate();
+            if(newStatus.equals("A")) {
+                System.out.println("Account created");
+            } else if (newStatus.equals("D")) {
+                System.out.println("Account denied");
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to update status");
+        }
+    }
+
+    @Override
+    public List<AccountRequest> getAccountRequestsByCustomerId(int customerId) {
         List<AccountRequest> accountRequests = new ArrayList<>();
 
-        String sql = "select * from accountrequest";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ResultSet resultSet = preparedStatement.executeQuery();
+        try {
+            String sql = "SELECT * FROM AccountRequest WHERE customer_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, customerId);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-        while (resultSet.next()) {
-            int requestId = resultSet.getInt("request_id");
-            int customerId = resultSet.getInt("customer_id");
-            String status = resultSet.getString("status");
-            accountRequests.add(new AccountRequest(requestId, customerId, status));
+            while (resultSet.next()) {
+                int requestId = resultSet.getInt("request_id");
+                int custId = resultSet.getInt("customer_id");
+                String status = resultSet.getString("status");
+                accountRequests.add(new AccountRequest(requestId, custId, status));
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to update status");
         }
-
         return accountRequests;
     }
 
 
-    @Override
-    public void updateAccountRequestStatus(int requestId, String newStatus) throws SQLException {
-        String sql = "UPDATE AccountRequest SET status = ? WHERE request_id = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, requestId);
-        preparedStatement.setString(2, newStatus);
-        preparedStatement.executeUpdate();
-    }
 }
