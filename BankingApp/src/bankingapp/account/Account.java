@@ -18,6 +18,13 @@ public class Account {
         this.status = status;
     }
 
+    public Account(int accountId, int custId, double balance, String status) {
+        this.accountId = accountId;
+        this.custId = custId;
+        this.balance = balance;
+        this.status = status;
+    }
+
     public int getAccountId() {return accountId; }
     public int getCustId() {
         return custId;

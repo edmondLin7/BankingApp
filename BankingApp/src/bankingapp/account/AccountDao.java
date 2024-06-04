@@ -7,5 +7,8 @@ public interface AccountDao {
 
     void deposit(int accountId, double amount);
 
-    public List<Account> findAccountsByCustomerId(int customerId);
+    void withdraw(int accountId, double amount);
+
+    List<Account> findAccountsByCustomerId(int customerId);
+    List<Account> findAllAccounts();
 }
